@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenerativeAI, FunctionDeclarationSchemaType } from '@google/generative-ai';
 
 
 const genAI = new GoogleGenerativeAI(process.env.API_KEY);
@@ -16,7 +16,27 @@ const funcoes = {
   }
 };
 
-const model = genAI.getGenerativeModel({ model: "gemini-1.0-pro"});
+const tools = [
+  {
+    functionDeclarations: [
+      {
+        name: "taxaJurosParcelamento",
+        description: "Retorna a taxa de juros para parcelamento baseado na quantidade de meses",
+        parameters: {
+          type: FunctionDeclarationSchemaType.OBJECT,
+          properties: {
+            value: { type: FunctionDeclarationSchemaType.NUMBER },
+          },
+          required: ["value"],
+        } 
+      }
+    ]
+  }
+]
+
+const model = genAI.getGenerativeModel(
+  { model: "gemini-1.0-pro", tools},
+  { apiVersion: "v1beta"});
 
 let chat;
 
@@ -43,4 +63,4 @@ function inicializaChat() {
   });
 }
 
-export { chat, inicializaChat}
+export { chat, funcoes, inicializaChat}
